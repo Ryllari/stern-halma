@@ -3,13 +3,13 @@
 import pygame as pg
 import Pyro4
 
+from board import Table, colors
 from chat import Chat
 from pygame.locals import *
 from threading import Thread
 from threads import receive_packet
 
 PLAYERS = ['Verde', 'Vermelho']
-
 
 gameserver = Pyro4.Proxy("PYRONAME:gameserver")
 playerid = gameserver.choose_player()
@@ -28,7 +28,9 @@ screen = pg.display.set_mode(SCREEN_SIZE)
 screen.fill(BACKGROUND_COLOR)
 pg.display.set_caption(CAPTION)
 screen.blit(bg_image, (0, 0))
-screen.blit(font.render(f'Player {playerid} ({PLAYERS[playerid-1]})', True, (255, 255, 255)), (700, 750))
+screen.blit(font.render(f'Player {playerid} ({PLAYERS[playerid-1]})', True, colors['p1']), (700, 750))
+gameboard = Table()
+gameboard.render(screen)
 pg.display.update()
 
 
