@@ -74,6 +74,7 @@ def board_init():
 class Table(object):
     def __init__(self):
         self.board = board_init()
+        self.playertime = False
 
     def render(self, screen):
         for array in self.board:
@@ -94,6 +95,12 @@ class Table(object):
 
     def reset_board(self):
         self.board = board_init()
+
+    def set_playertime(self, playertime):
+        self.playertime = playertime
+
+    def get_playertime(self):
+        return self.playertime
 
     def verify_win(self, playerid):
         if playerid == 1:

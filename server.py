@@ -16,13 +16,13 @@ class GameServer(object):
         if not self.players:
             self.players.append('Verde')
             return 1
-        elif self.players[0] is None:
+        elif self.players[0] == None:
             self.players[0] = 'Verde'
             return 1
         elif len(self.players) == 1:
             self.players.append('Vermelho')
             return 2
-        elif self.players[1] is None:
+        elif self.players[1] == None:
             self.players[1] = 'Vermelho'
             return 2
         else:

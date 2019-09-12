@@ -48,46 +48,79 @@ if playerid in [1, 2]:
     receive.start()
 
     finish = False
-    playertime = playerid is 1
+    gameboard.set_playertime(playerid is 1)
+
     while not finish:
-        view_playertime(screen, font, playerid)
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
-                finish = True
+        while not gameboard.get_playertime():
+            view_playertime(screen, font, other)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
+                    finish = True
 
-            elif event.type == KEYDOWN:
-                gamechat.write(event, screen, playerid, gameserver)
+                elif event.type == KEYDOWN:
+                    gamechat.write(event, screen, playerid, gameserver)
 
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                x, y = pg.mouse.get_pos()
-                if 670 <= y <= 730:  # Botoes
-                    if 600 <= x <= 800:  # Reiniciar
-                        gameserver.send_info(
-                            playerid, RESET_INFO, f'Player {playerid} reiniciou a partida!'
-                        )
-                        gameboard.reset_board()
-                        gameboard.render(screen)
-                    elif 900 <= x <= 1100:  # Desistir
-                        gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
-                        finish = True
-                elif (700 <= x <= 970) and (200 <= y <= 520):
-                    point = gameboard.get_point_by_coord(x, y)
-                    if point is not None:
-                        if point.get_color() == f'p{playerid}' and len(selected) == 0:
-                            selected.append(point)
-                            print('Clicou em mim!')
-                        elif point.get_color() == 'empty' and len(selected) ==1:
-                            print('Clicou no segundo eu')
-                            if selected[0].is_to_jump(point):
-                                print('Pode pular')
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    x, y = pg.mouse.get_pos()
+                    if 670 <= y <= 730:  # Botoes
+                        if 600 <= x <= 800:  # Reiniciar
+                            gameserver.send_info(
+                                playerid, RESET_INFO, f'Player {playerid} reiniciou a partida!'
+                            )
+                            gameboard.reset_board()
+                            gameboard.render(screen)
+                        elif 900 <= x <= 1100:  # Desistir
+                            gameserver.send_info(playerid, QUIT_INFO,
+                                                 f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
+                            finish = True
+
+        if gameboard.get_playertime():
+            gameboard.render(screen)
+            view_playertime(screen, font, playerid)
+            pg.display.update()
+
+        while gameboard.get_playertime():
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
+                    finish = True
+
+                elif event.type == KEYDOWN:
+                    gamechat.write(event, screen, playerid, gameserver)
+
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    x, y = pg.mouse.get_pos()
+                    if 670 <= y <= 730:  # Botoes
+                        if 600 <= x <= 800:  # Reiniciar
+                            gameserver.send_info(
+                                playerid, RESET_INFO, f'Player {playerid} reiniciou a partida!'
+                            )
+                            gameboard.reset_board()
+                            gameboard.render(screen)
+                        elif 900 <= x <= 1100:  # Desistir
+                            gameserver.send_info(playerid, QUIT_INFO,
+                                                 f'Player {playerid} desistiu! PLAYER {other} VENCEU!'
+                                                 )
+                            finish = True
+                    elif (700 <= x <= 970) and (200 <= y <= 520):
+                        point = gameboard.get_point_by_coord(x, y)
+                        if point is not None:
+                            if point.get_color() == f'p{playerid}' and len(selected) == 0:
                                 selected.append(point)
-                    if len(selected) == 2:
-                        gameboard.move_points(selected[0], selected[1])
-                        gameserver.send_info(playerid, BOARD_INFO, [[p.x, p.y] for p in selected])
-                        selected = []
-                    gameboard.render(screen)
-
+                                print('Clicou em mim!')
+                            elif point.get_color() == 'empty' and len(selected) ==1:
+                                print('Clicou no segundo eu')
+                                if selected[0].is_to_jump(point):
+                                    print('Pode pular')
+                                    selected.append(point)
+                        if len(selected) == 2:
+                            gameboard.move_points(selected[0], selected[1])
+                            gameserver.send_info(playerid, BOARD_INFO, [[p.x, p.y] for p in selected])
+                            gameboard.set_playertime(False)
+                            selected = []
+                        gameboard.render(screen)
+            pg.display.update()
 
 else:
     font = pg.font.SysFont("arial", 40)

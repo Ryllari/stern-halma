@@ -1,3 +1,4 @@
+import pygame as pg
 from constants import *
 
 
@@ -18,7 +19,6 @@ def wait_gameserver(playerid, gameserver, chat, screen, gameboard):
         elif info.get('type_info', None) is BOARD_INFO:
             player_point = gameboard.get_point_by_coord(info.get('info')[0][0], info.get('info')[0][1])
             other_point = gameboard.get_point_by_coord(info.get('info')[1][0], info.get('info')[1][1])
-            print('MUDA')
             gameboard.move_points(player_point, other_point)
-
+            gameboard.set_playertime(True)
         gameserver.reset_msg_controller(playerid)
