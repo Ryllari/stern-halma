@@ -45,9 +45,8 @@ def create_line(x, y, color, count):
     return line
 
 
-class Table(object):
-    def __init__(self):
-        self.board = [
+def board_init():
+    return [
             create_line(820, 200, 'p1', 1),
             create_line(810, 220, 'p1', 2),
             create_line(800, 240, 'p1', 3),
@@ -71,6 +70,11 @@ class Table(object):
             create_line(820, 520, 'p2', 1),
         ]
 
+
+class Table(object):
+    def __init__(self):
+        self.board = board_init()
+
     def render(self, screen):
         for array in self.board:
             for point in array:
@@ -88,6 +92,9 @@ class Table(object):
         other_point.set_color(player_point.get_color())
         player_point.set_color('empty')
 
+    def reset_board(self):
+        self.board = board_init()
+
     def verify_win(self, playerid):
         if playerid == 1:
             win_board = self.board[-4:]
@@ -103,6 +110,7 @@ class Table(object):
                     if point.get_color() != 'p2':
                         return False
             return True
+
 
 # ------- Funcoes para melhorar visual -------- #
 def view_playertime(screen, font, player):

@@ -1,9 +1,9 @@
 # -*-coding: utf-8-*-
-
+import json
 import pygame as pg
 import Pyro4
 
-from board import Table, colors, view_playertime
+from board import Table, colors, view_playertime, board_init
 from chat import Chat
 from constants import *
 from pygame.locals import *
@@ -43,7 +43,7 @@ if playerid in [1, 2]:
 
     gamechat = Chat()
 
-    receive = Thread(target=wait_gameserver, args=(playerid, gameserver, gamechat, screen))
+    receive = Thread(target=wait_gameserver, args=(playerid, gameserver, gamechat, screen, gameboard))
     receive.daemon = True
     receive.start()
 
@@ -63,7 +63,11 @@ if playerid in [1, 2]:
                 x, y = pg.mouse.get_pos()
                 if 670 <= y <= 730:  # Botoes
                     if 600 <= x <= 800:  # Reiniciar
-                        gameserver.send_info(playerid, RESET_INFO, f'Player {playerid} reiniciou a partida!')
+                        gameserver.send_info(
+                            playerid, RESET_INFO, f'Player {playerid} reiniciou a partida!'
+                        )
+                        gameboard.reset_board()
+                        gameboard.render(screen)
                     elif 900 <= x <= 1100:  # Desistir
                         gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
                         finish = True
@@ -80,8 +84,8 @@ if playerid in [1, 2]:
                                 selected.append(point)
                     if len(selected) == 2:
                         gameboard.move_points(selected[0], selected[1])
+                        gameserver.send_info(playerid, BOARD_INFO, [[p.x, p.y] for p in selected])
                         selected = []
-
                     gameboard.render(screen)
 
 
