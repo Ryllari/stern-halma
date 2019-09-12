@@ -2,6 +2,8 @@
 
 import Pyro4
 
+from constants import *
+
 
 @Pyro4.expose
 @Pyro4.behavior(instance_mode='single')
@@ -14,17 +16,31 @@ class GameServer(object):
         if not self.players:
             self.players.append('Verde')
             return 1
+        elif self.players[0] is None:
+            self.players[0] = 'Verde'
+            return 1
         elif len(self.players) == 1:
             self.players.append('Vermelho')
+            return 2
+        elif self.players[1] is None:
+            self.players[1] = 'Vermelho'
             return 2
         else:
             return 0
 
     def send_info(self, player, type_info, info,):
-        self.msg[player-1] = {
-            'type_info': type_info,
-            'info': info,
-        }
+        if type_info in [CHAT_INFO, BOARD_INFO]:
+            self.msg[player-1] = {
+                'type_info': type_info,
+                'info': info,
+            }
+        else:
+            if type_info == QUIT_INFO:
+                self.players[player-1] = None
+            self.msg = [{
+                'type_info': type_info,
+                'info': info,
+            }] * 2
 
     def request_info(self, player):
         return self.msg[player-2]

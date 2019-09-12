@@ -10,7 +10,6 @@ def wait_gameserver(playerid, gameserver, chat, screen):
             chat.history.append(f"INFO: LÁ VAMOS NÓS DE NOVO! {info.get('info')}")
             chat.send_msg(screen)
         elif info.get('type_info', None) is QUIT_INFO:
-            chat.history.append(f"INFO: {info.get('info')} PLAYER {playerid} VENCEU!")
+            chat.history.append(f"INFO: {info.get('info')}")
             chat.send_msg(screen)
-
         gameserver.reset_msg_controller(playerid)
