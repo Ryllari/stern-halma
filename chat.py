@@ -1,6 +1,7 @@
 # -*-coding: utf-8-*-
 
 import pygame as pg
+from constants import CHAT_INFO
 from pygame.locals import *
 
 pg.font.init()
@@ -20,7 +21,7 @@ class Chat(object):
             self.msg = f"P{playerid}: " + self.msg
             self.history.append(self.msg)
             self.char = []
-            gameserver.send_info(playerid, self.msg)
+            gameserver.send_info(playerid, CHAT_INFO, self.msg)
             self.send_msg(screen)
         elif event.key <= 255:
             if len(self.char) < 30:

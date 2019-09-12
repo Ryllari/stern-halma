@@ -5,9 +5,10 @@ import Pyro4
 
 from board import Table, colors
 from chat import Chat
+from constants import *
 from pygame.locals import *
 from threading import Thread
-from threads import receive_packet
+from threads import wait_gameserver
 
 PLAYERS = ['Verde', 'Vermelho']
 
@@ -33,10 +34,9 @@ gameboard = Table()
 gameboard.render(screen)
 pg.display.update()
 
-
 gamechat = Chat()
 
-receive = Thread(target=receive_packet, args=(playerid, gameserver, gamechat, screen))
+receive = Thread(target=wait_gameserver, args=(playerid, gameserver, gamechat, screen))
 receive.daemon = True
 receive.start()
 
@@ -44,7 +44,21 @@ finish = False
 while not finish:
     for event in pg.event.get():
         if event.type == pg.QUIT:
+            gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu!')
             finish = True
-        if event.type == KEYDOWN:
+
+        elif event.type == KEYDOWN:
             gamechat.write(event, screen, playerid, gameserver)
+
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            x, y = pg.mouse.get_pos()
+            if 670 <= y <= 730: # Botoes
+                if 600 <= x <= 800: # Reiniciar
+                    gameserver.send_info(playerid, RESET_INFO, f'Player {playerid} reiniciou a partida!')
+                elif 900 <= x <= 1100:
+                    gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu!')
+                    finish = True
+
+
+
 

@@ -8,7 +8,7 @@ import Pyro4
 class GameServer(object):
     def __init__(self):
         self.players = []
-        self.msg = [None] * 2
+        self.msg = [{'type_info': None, 'info': None}] * 2
 
     def choose_player(self):
         if not self.players:
@@ -20,17 +20,20 @@ class GameServer(object):
         else:
             return 0
 
-    def send_info(self, player, info):
-        self.msg[player-1] = info
+    def send_info(self, player, type_info, info,):
+        self.msg[player-1] = {
+            'type_info': type_info,
+            'info': info,
+        }
 
     def request_info(self, player):
         return self.msg[player-2]
 
     def reset_msg_controller(self, player):
-        if player == 1:
-            self.msg[1] = None
-        elif player == 2:
-            self.msg[0] = None
+        self.msg[player-2] = {
+            'type_info': None,
+            'info': None,
+        }
 
 
 if __name__ == "__main__":
