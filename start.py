@@ -27,6 +27,7 @@ pg.display.set_caption(CAPTION)
 
 
 if playerid in [1, 2]:
+    selected = []
     other = playerid + 1 if playerid == 1 else 1
     bg_image = pg.image.load("background.png")
     font = pg.font.SysFont("arial", 20)
@@ -66,6 +67,23 @@ if playerid in [1, 2]:
                     elif 900 <= x <= 1100:  # Desistir
                         gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
                         finish = True
+                elif (700 <= x <= 970) and (200 <= y <= 520):
+                    point = gameboard.get_point_by_coord(x, y)
+                    if point is not None:
+                        if point.get_color() == f'p{playerid}' and len(selected) == 0:
+                            selected.append(point)
+                            print('Clicou em mim!')
+                        elif point.get_color() == 'empty' and len(selected) ==1:
+                            print('Clicou no segundo eu')
+                            if selected[0].is_to_jump(point):
+                                print('Pode pular')
+                                selected.append(point)
+                    if len(selected) == 2:
+                        gameboard.move_points(selected[0], selected[1])
+                        selected = []
+
+                    gameboard.render(screen)
+
 
 else:
     font = pg.font.SysFont("arial", 40)

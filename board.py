@@ -17,8 +17,21 @@ class Point(object):
     def get_position(self):
         return self.x, self.y
 
+    def is_clicking_me(self, pos_x, pos_y):
+        return (self.x - 10 <= pos_x <= self.x + 10) and (self.y - 10 <= pos_y <= self.y + 10)
+
+    def is_to_jump(self, other):
+        if other.y == self.y:
+            return other.x in [self.x -20, self.x + 20]
+        elif other.y in [self.y - 20, self.y + 20]:
+            return other.x in [self.x - 10, self.x + 10]
+        return False
+
     def get_color(self):
         return self.color
+
+    def set_color(self, color):
+        self.color = color
 
     def render(self, screen):
         return pg.draw.circle(screen, colors[self.color], (self.x, self.y), 10, 10)
@@ -64,6 +77,32 @@ class Table(object):
                 point.render(screen)
         pg.display.flip()
 
+    def get_point_by_coord(self, x, y):
+        for i, array in enumerate(self.board):
+            for j, point in enumerate(array):
+                if point.is_clicking_me(x, y):
+                    return point
+        return None
+
+    def move_points(self, player_point, other_point):
+        other_point.set_color(player_point.get_color())
+        player_point.set_color('empty')
+
+    def verify_win(self, playerid):
+        if playerid == 1:
+            win_board = self.board[-4:]
+            for array in win_board:
+                for point in array:
+                    if point.get_color() != 'p1':
+                        return False
+            return True
+        else:
+            win_board = self.board[:4]
+            for array in win_board:
+                for point in array:
+                    if point.get_color() != 'p2':
+                        return False
+            return True
 
 # ------- Funcoes para melhorar visual -------- #
 def view_playertime(screen, font, player):
