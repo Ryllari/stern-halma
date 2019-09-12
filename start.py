@@ -3,7 +3,7 @@
 import pygame as pg
 import Pyro4
 
-from board import Table, colors
+from board import Table, colors, view_playertime
 from chat import Chat
 from constants import *
 from pygame.locals import *
@@ -32,7 +32,10 @@ if playerid in [1, 2]:
     font = pg.font.SysFont("arial", 20)
 
     screen.blit(bg_image, (0, 0))
-    screen.blit(font.render(f'Player {playerid} ({PLAYERS[playerid-1]})', True, colors[f'p{playerid}']), (700, 750))
+    screen.blit(
+        font.render(f'Você é o Player {playerid} ({PLAYERS[playerid-1]})', True, colors[f'p{playerid}']),
+        (700, 750)
+    )
     gameboard = Table()
     gameboard.render(screen)
     pg.display.update()
@@ -44,7 +47,9 @@ if playerid in [1, 2]:
     receive.start()
 
     finish = False
+    playertime = playerid is 1
     while not finish:
+        view_playertime(screen, font, playerid)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')

@@ -63,3 +63,10 @@ class Table(object):
             for point in array:
                 point.render(screen)
         pg.display.flip()
+
+
+# ------- Funcoes para melhorar visual -------- #
+def view_playertime(screen, font, player):
+    pg.draw.rect(screen, (72, 72, 72), (730, 600, 300, 50))
+    screen.blit(font.render(f'Vez do Player {player}!', True, (255, 255, 255)), (750, 600))
+    pg.display.flip()
