@@ -3,12 +3,12 @@ import json
 import pygame as pg
 import Pyro4
 
-from board import Table, colors, view_playertime, board_init
+from board import Table, colors, view_playertime
 from chat import Chat
 from constants import *
 from pygame.locals import *
-from threading import Thread
-from threads import wait_gameserver
+from threads import *
+from sys import exit
 
 PLAYERS = ['Verde', 'Vermelho']
 
@@ -43,9 +43,9 @@ if playerid in [1, 2]:
 
     gamechat = Chat()
 
-    receive = Thread(target=wait_gameserver, args=(playerid, gameserver, gamechat, screen, gameboard))
-    receive.daemon = True
-    receive.start()
+#    receive = Thread(target=wait_gameserver, args=(playerid, gameserver, gamechat, screen, gameboard))
+#    receive.daemon = True
+#    receive.start()
 
     finish = False
     gameboard.set_playertime(playerid is 1)
@@ -53,10 +53,13 @@ if playerid in [1, 2]:
     while not finish:
         while not gameboard.get_playertime():
             view_playertime(screen, font, other)
+            wait_gameserver(playerid, gameserver, gamechat, screen, gameboard)
+            wait_chat_gameserver(playerid, gameserver, gamechat, screen)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
                     finish = True
+                    exit()
 
                 elif event.type == KEYDOWN:
                     gamechat.write(event, screen, playerid, gameserver)
@@ -74,6 +77,9 @@ if playerid in [1, 2]:
                             gameserver.send_info(playerid, QUIT_INFO,
                                                  f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
                             finish = True
+                            exit()
+                            
+            wait_board_gameserver(playerid, gameserver, gameboard)
 
         if gameboard.get_playertime():
             gameboard.render(screen)
@@ -81,10 +87,14 @@ if playerid in [1, 2]:
             pg.display.update()
 
         while gameboard.get_playertime():
+            wait_gameserver(playerid, gameserver, gamechat, screen, gameboard)
+            wait_chat_gameserver(playerid, gameserver, gamechat, screen)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     gameserver.send_info(playerid, QUIT_INFO, f'Player {playerid} desistiu! PLAYER {other} VENCEU!')
                     finish = True
+                    exit()
+                    
 
                 elif event.type == KEYDOWN:
                     gamechat.write(event, screen, playerid, gameserver)
@@ -103,6 +113,8 @@ if playerid in [1, 2]:
                                                  f'Player {playerid} desistiu! PLAYER {other} VENCEU!'
                                                  )
                             finish = True
+                            exit()
+                            
                     elif (700 <= x <= 970) and (200 <= y <= 520):
                         point = gameboard.get_point_by_coord(x, y)
                         if point is not None:
@@ -120,6 +132,8 @@ if playerid in [1, 2]:
                             gameboard.set_playertime(False)
                             selected = []
                         gameboard.render(screen)
+                        if gameboard.verify_win(playerid):
+                            gameserver.send_info(playerid, WIN_INFO, f'Player {playerid} VENCEU!')
             pg.display.update()
 
 else:

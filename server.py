@@ -10,7 +10,9 @@ from constants import *
 class GameServer(object):
     def __init__(self):
         self.players = []
-        self.msg = [{'type_info': None, 'info': None}] * 2
+        self.msg = [[]] * 2
+        self.board = [[]] * 2
+        self.action = [{'type_info': None, 'info': None}] * 2
 
     def choose_player(self):
         if not self.players:
@@ -29,24 +31,35 @@ class GameServer(object):
             return 0
 
     def send_info(self, player, type_info, info,):
-        if type_info in [CHAT_INFO, BOARD_INFO]:
-            self.msg[player-1] = {
-                'type_info': type_info,
-                'info': info,
-            }
+        if type_info == CHAT_INFO:
+            self.msg[player - 1].append(info)
+        if type_info == BOARD_INFO:
+            self.board[player-1] = info
         else:
             if type_info == QUIT_INFO:
                 self.players[player-1] = None
-            self.msg = [{
+            self.action = [{
                 'type_info': type_info,
                 'info': info,
             }] * 2
 
-    def request_info(self, player):
+    def request_chat(self, player):
         return self.msg[player-2]
 
+    def request_board(self, player):
+        return self.board[player-2]
+
+    def request_action(self, player):
+        return self.action[player-2]
+
     def reset_msg_controller(self, player):
-        self.msg[player-2] = {
+        self.msg[player-2] = []
+
+    def reset_board_controller(self, player):
+        self.board[player-2] = []
+
+    def reset_action_controller(self, player):
+        self.action[player-2] = {
             'type_info': None,
             'info': None,
         }

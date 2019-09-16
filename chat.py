@@ -36,8 +36,8 @@ class Chat(object):
     def send_msg(self, screen):
         if len(self.history) == 33:
             self.history.pop(0)
-            pg.draw.rect(screen, (72, 72, 72), (0, 40, 450, 650))
 
+        pg.draw.rect(screen, (72, 72, 72), (0, 40, 450, 650))
         pos_y = 50
         for msg in self.history:
             screen.blit(font.render(msg, 1, (255, 255, 255)), (40, pos_y))
