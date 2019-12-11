@@ -1,4 +1,4 @@
-# Stern Halma / Chinese Checkers / Damas Chinesas (Em andamento)
+# Stern Halma / Chinese Checkers / Damas Chinesas
 Jogo desenvolvido em Python utilizando Pygame para GUI e Pyro4 para comunicação para a disciplinade Programação Paralela e Distribuída
 
 
